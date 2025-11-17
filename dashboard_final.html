@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Informasi Jadwal Rapat</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         /* CSS Lengkap */
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Roboto:wght@400;500&display=swap');
@@ -42,35 +45,32 @@
         .form-group label { margin-bottom: 5px; font-weight: 500; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         .full-width { grid-column: 1 / -1; }
-        #detail-view .container { background: var(--secondary-color); color: var(--text-light); border-radius: 15px; padding: 30px; max-width: 1100px; margin: auto; }
+        /* CSS Tampilan Detail (Sudah disederhanakan tanpa tab) */
+        #detail-view .container { background: var(--secondary-color); color: var(--text-light); border-radius: 15px; padding: 30px; max-width: 900px; margin: auto; }
         #detail-view h1, #detail-view h2, #detail-view h3 { color: var(--text-light); }
-        #detail-view h1 { text-align: center; color: var(--accent-color); font-size: 2.2rem; }
-        .detail-tabs { display: flex; border-bottom: 1px solid var(--accent-color); margin-bottom: 20px; }
-        .tab-link { padding: 15px 20px; cursor: pointer; font-weight: 500; border-bottom: 3px solid transparent; }
-        .tab-link.active { border-bottom-color: var(--accent-color); color: var(--accent-color); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        /* CSS .info-grid dan .qr-code-container sudah dihapus */
-        #detail-view p { font-size: 1.1rem; line-height: 1.6; }
-        #detail-view p a { color: var(--accent-color); text-decoration: underline; }
-        #notulensi textarea { width: 100%; box-sizing: border-box; min-height: 120px; padding: 10px; border-radius: 8px; }
-        #notulensi input { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; }
+        #detail-view h1 { text-align: center; color: var(--accent-color); font-size: 2.2rem; margin-bottom: 25px; }
+        #detail-view p { font-size: 1.1rem; line-height: 1.6; margin: 10px 0; }
+        #detail-view p strong { color: var(--accent-color); min-width: 150px; display: inline-block; }
+        #detail-view p a { color: #4dabf7; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div id="dashboard-view" class="view">
-        <div class="stats-grid">
+        <div class.stats-grid>
             <div class="stat-card"><div id="stat-total" class="value">0</div><div class="label">Total Rapat</div></div>
             <div class="stat-card"><div id="stat-terjadwal" class="value">0</div><div class="label">Rapat Terjadwal</div></div>
         </div>
         <div class="card">
             <div class="card-header">
-                <h2>Daftar Jadwal Zoom Kejaksaan Negeri Aceh Barat</h2>
-                <button id="add-new-btn" class="btn-primary">Tambah Jadwal Baru</button>
+                <h2>Daftar Jadwal Rapat</h2>
+                <div>
+                    <button id="export-btn" class="btn-secondary" style="margin-right: 10px;">Ekspor ke JPG</button>
+                    <button id="add-new-btn" class="btn-primary">Tambah Jadwal Baru</button>
+                </div>
             </div>
-            <div id="data-table-container">
+            
+            <div id="data-table-container"> 
                 <div id="loading-spinner" class="loading-spinner">Memuat data...</div>
                 <table id="dataTable" style="display:none;">
                     <thead>
@@ -101,38 +101,37 @@
           <input type="hidden" id="ID" name="ID">
           <div class="form-grid">
             <div class="form-group full-width"><label for="Judul">Judul Meeting</label><input type="text" id="Judul" name="Judul" required></div>
-            
             <div class="form-group"><label for="Tanggal">Tanggal</label><input type="date" id="Tanggal" name="Tanggal"></div>
             
-<div class="form-group">
-  <label for="Waktu">Waktu Mulai (WIB)</label>
-  <select id="Waktu" name="Waktu" required>
-    <option value="">-- Pilih Waktu Mulai --</option>
-    <option value="08:00 - Selesai">08:00 - Selesai</option>
-    <option value="08:30 - Selesai">08:30 - Selesai</option>
-    <option value="09:00 - Selesai">09:00 - Selesai</option>
-    <option value="09:30 - Selesai">09:30 - Selesai</option>
-    <option value="10:00 - Selesai">10:00 - Selesai</option>
-    <option value="10:30 - Selesai">10:30 - Selesai</option>
-    <option value="11:00 - Selesai">11:00 - Selesai</option>
-    <option value="11:30 - Selesai">11:30 - Selesai</option>
-    <option value="13:00 - Selesai">13:00 - Selesai</option>
-    <option value="13:30 - Selesai">13:30 - Selesai</option>
-    <option value="14:00 - Selesai">14:00 - Selesai</option>
-    <option value="14:30 - Selesai">14:30 - Selesai</option>
-    <option value="15:00 - Selesai">15:00 - Selesai</option>
-    <option value="15:30 - Selesai">15:30 - Selesai</option>
-    <option value="16:00 - Selesai">16:00 - Selesai</option>
-    <option value="16:30 - Selesai">16:30 - Selesai</option>
-    <option value="Lainnya - Selesai">Lainnya - Selesai</option>
-  </select>
-</div>
+            <div class="form-group">
+              <label for="Waktu">Waktu Mulai (WIB)</label>
+              <select id="Waktu" name="Waktu" required>
+                <option value="">-- Pilih Waktu Mulai --</option>
+                <option value="08:00 - Selesai">08:00 - Selesai</option>
+                <option value="08:30 - Selesai">08:30 - Selesai</option>
+                <option value="09:00 - Selesai">09:00 - Selesai</option>
+                <option value="09:30 - Selesai">09:30 - Selesai</option>
+                <option value="10:00 - Selesai">10:00 - Selesai</option>
+                <option value="10:30 - Selesai">10:30 - Selesai</option>
+                <option value="11:00 - Selesai">11:00 - Selesai</option>
+                <option value="11:30 - Selesai">11:30 - Selesai</option>
+                <option value="13:00 - Selesai">13:00 - Selesai</option>
+                <option value="13:30 - Selesai">13:30 - Selesai</option>
+                <option value="14:00 - Selesai">14:00 - Selesai</option>
+                <option value="14:30 - Selesai">14:30 - Selesai</option>
+                <option value="15:00 - Selesai">15:00 - Selesai</option>
+                <option value="15:30 - Selesai">15:30 - Selesai</option>
+                <option value="16:00 - Selesai">16:00 - Selesai</option>
+                <option value="16:30 - Selesai">16:30 - Selesai</option>
+                <option value="Lainnya - Selesai">Lainnya - Selesai</option>
+              </select>
+            </div>
             
             <div class="form-group"><label for="Penyelenggara">Penyelenggara</label><select id="Penyelenggara" name="Penyelenggara"></select></div>
             <div class="form-group"><label for="Status">Status</label><select id="Status" name="Status"></select></div>
             <div class="form-group"><label for="MeetingID">Meeting ID</label><input type="text" id="MeetingID" name="MeetingID"></div>
             <div class="form-group"><label for="Passcode">Passcode</label><input type="text" id="Passcode" name="Passcode"></div>
-            <div class="form-group full-width"><label for="Link">Link Meeting</label><input type="text" id="Link" name="Link"></div>
+            <div class.form-group full-width"><label for="Link">Link Meeting</label><input type="text" id="Link" name="Link"></div>
           </div>
           <button type="submit" id="submitBtn" class="btn-primary" style="width:100%;margin-top:20px;"></button>
         </form>
@@ -140,8 +139,8 @@
     </div>
     
     <script>
-        // PASTE URL WEB APP BARU ANDA DARI FASE 2 DI SINI
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFxGh7H8nbIAcTR-lLuABW4B7PGlBldD7gTNB-otqAokw5-zqdWbkCL9I96Q7-0Dl4/exec';
+        // JANGAN LUPA: Ganti dengan URL Apps Script Anda yang sudah di-deploy
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDxjqspybO3GMmK99S0IMPsfHkS18RciAF2WFopcdhbmnsXdc0CwcA4icpRFwYGAo/exec';
         
         let ALL_DATA = { jadwal: [], penyelenggara: [], status: [] };
         
@@ -155,10 +154,11 @@
             document.body.addEventListener('click', e => {
                 if (e.target.classList.contains('back-to-dashboard')) showView('dashboard-view');
             });
+            
+            document.getElementById('export-btn').addEventListener('click', exportToImage);
         });
         
         function fetchInitialData(showLoading = true) {
-            // (Fungsi ini tidak berubah)
             if (showLoading) showSpinner(true);
             fetch(`${SCRIPT_URL}?action=getInitialData`)
                 .then(res => res.json())
@@ -174,19 +174,16 @@
 
         // --- Render & UI ---
         function showView(viewId) {
-            // (Fungsi ini tidak berubah)
             document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
             document.getElementById(viewId).style.display = 'block';
         }
 
         function showSpinner(show) {
-            // (Fungsi ini tidak berubah)
             document.getElementById('loading-spinner').style.display = show ? 'block' : 'none';
             document.getElementById('dataTable').style.display = show ? 'none' : 'table';
         }
 
         function renderTable() {
-            // (Fungsi ini tidak berubah)
             const tableBody = document.querySelector("#dataTable tbody");
             tableBody.innerHTML = '';
             ALL_DATA.jadwal.sort((a,b) => new Date(b.Timestamp) - new Date(a.Timestamp)).forEach(row => {
@@ -206,14 +203,12 @@
         }
         
         function updateStats() {
-            // (Fungsi ini tidak berubah)
             document.getElementById('stat-total').textContent = ALL_DATA.jadwal.length;
             const terjadwal = ALL_DATA.jadwal.filter(r => r.Status === 'Terjadwal').length;
             document.getElementById('stat-terjadwal').textContent = terjadwal;
         }
 
         function populateDropdowns() {
-            // (Fungsi ini tidak berubah)
             const penyelenggaraSelect = document.getElementById('Penyelenggara');
             const statusSelect = document.getElementById('Status');
             penyelenggaraSelect.innerHTML = '<option value="">-- Pilih Penyelenggara --</option>';
@@ -227,7 +222,6 @@
         }
 
         function openFormModal(id = null) {
-            // (Fungsi ini tidak berubah)
             const form = document.getElementById('zoomForm');
             form.reset();
             const modal = document.getElementById('form-modal');
@@ -247,62 +241,39 @@
             modal.style.display = 'flex';
         }
 
-        // PERUBAHAN 2: MENGHAPUS QR CODE DARI TAMPILAN DETAIL
+        // Versi renderDetailView (FINAL - TANPA NOTULENSI)
         function renderDetailView(id) {
             fetch(`${SCRIPT_URL}?action=getMeetingDetails&id=${id}`)
                 .then(res => res.json())
                 .then(response => {
                     if (response.result === 'error') throw new Error(response.message);
-                    const { jadwal, notulensi } = response.data;
+                    
+                    const { jadwal } = response.data;
                     const detailView = document.getElementById('detail-view');
                     
-                    // HTML baru tanpa QR code dan layout grid
                     detailView.innerHTML = `
                       <div class="container">
                         <button class="back-to-dashboard btn-secondary" style="margin-bottom: 20px;">&larr; Kembali ke Daftar Rapat</button>
+                        
                         <h1>${jadwal.Judul}</h1>
-                        <div class="detail-tabs">
-                          <div class="tab-link active" onclick="openTab(event, 'info')">Info Umum</div>
-                          <div class="tab-link" onclick="openTab(event, 'notulensi')">Notulensi & Tindak Lanjut</div>
-                        </div>
                         
-                        <div id="info" class="tab-content active">
-                          <div>
-                            <h3>Detail Rapat</h3>
-                            <p><strong>Tanggal & Waktu:</strong> ${jadwal.Tanggal || '-'} | ${jadwal.Waktu || '-'}</p>
-                            <p><strong>Penyelenggara:</strong> ${jadwal.Penyelenggara || '-'}</p>
-                            <p><strong>Status:</strong> ${jadwal.Status || '-'}</p>
-                            <h3 style="margin-top:20px;">Info Koneksi</h3>
-                            <p><strong>Meeting ID:</strong> ${jadwal.MeetingID || '-'}</p>
-                            <p><strong>Passcode:</strong> ${jadwal.Passcode || '-'}</p>
-                            <p><strong>Link:</strong> ${jadwal.Link ? `<a href="${jadwal.Link}" target="_blank" rel="noopener noreferrer">${jadwal.Link}</a>` : '-'}</p>
-                          </div>
-                        </div>
+                        <h3 style="color: var(--accent-color);">Detail Rapat</h3>
+                        <p><strong>Tanggal & Waktu:</strong> ${jadwal.Tanggal || '-'} | ${jadwal.Waktu || '-'}</p>
+                        <p><strong>Penyelenggara:</strong> ${jadwal.Penyelenggara || '-'}</p>
+                        <p><strong>Status:</strong> ${jadwal.Status || '-'}</p>
                         
-                        <div id="notulensi" class="tab-content">
-                          <div class="form-group"><label for="Pimpinan_Rapat"><h3>Pimpinan Rapat</h3></label><input type="text" id="Pimpinan_Rapat" value="${notulensi.Pimpinan_Rapat || ''}"></div>
-                          <div class="form-group"><label for="Peserta_Hadir"><h3>Peserta Hadir</h3></label><textarea id="Peserta_Hadir">${notulensi.Peserta_Hadir || ''}</textarea></div>
-                          <div class="form-group"><label for="Isi_Notulensi"><h3>Isi Notulensi</h3></label><textarea id="Isi_Notulensi">${notulensi.Isi_Notulensi || ''}</textarea></div>
-                          <div class="form-group"><label for="Tindak_Lanjut"><h3>Tindak Lanjut</h3></label><textarea id="Tindak_Lanjut">${notulensi.Tindak_Lanjut || ''}</textarea></div>
-                          <button class="btn-primary" style="margin-top:15px;" onclick="saveNotulensi('${jadwal.ID}')">Simpan Notulensi</button>
-                        </div>
+                        <h3 style="color: var(--accent-color); margin-top:20px;">Info Koneksi</h3>
+                        <p><strong>Meeting ID:</strong> ${jadwal.MeetingID || '-'}</p>
+                        <p><strong>Passcode:</strong> ${jadwal.Passcode || '-'}</p>
+                        <p><strong>Link:</strong> ${jadwal.Link ? `<a href="${jadwal.Link}" target="_blank" rel="noopener noreferrer">${jadwal.Link}</a>` : '-'}</p>
                       </div>
                     `;
                     showView('detail-view');
                 }).catch(handleError);
         }
 
-        function openTab(evt, tabName) {
-            // (Fungsi ini tidak berubah)
-            document.querySelectorAll('#detail-view .tab-content').forEach(tc => tc.style.display = "none");
-            document.querySelectorAll('#detail-view .tab-link').forEach(tl => tl.className = tl.className.replace(" active", ""));
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
-        
         // --- Aksi Data ---
         function handleFormSubmit(e) { 
-            // (Fungsi ini tidak berubah)
             e.preventDefault();
             const form = e.target;
             const submitBtn = form.querySelector('button[type="submit"]');
@@ -310,8 +281,7 @@
             submitBtn.textContent = 'Menyimpan...';
             
             const payload = Object.fromEntries(new FormData(form).entries());
-            const action = payload.ID ? 'updateMeeting' : 'saveMeeting';
-
+            
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveMeeting', payload }) })
                 .then(res => res.json())
                 .then(response => {
@@ -326,8 +296,8 @@
         }
 
         function deleteMeeting(id) {
-            // (Fungsi ini tidak berubah)
-            if (!confirm('Apakah Anda yakin ingin menghapus jadwal ini? Ini juga akan menghapus notulensinya.')) return;
+            if (!confirm('Apakah Anda yakin ingin menghapus jadwal ini?')) return;
+            
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteMeeting', id }) })
                 .then(res => res.json())
                 .then(response => {
@@ -337,40 +307,46 @@
                 }).catch(handleError);
         }
         
-        function saveNotulensi(id) {
-            // (Fungsi ini tidak berubah)
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = 'Menyimpan...';
-            const payload = {
-                ID_Rapat: id,
-                Pimpinan_Rapat: document.getElementById('Pimpinan_Rapat').value,
-                Peserta_Hadir: document.getElementById('Peserta_Hadir').value,
-                Isi_Notulensi: document.getElementById('Isi_Notulensi').value,
-                Tindak_Lanjut: document.getElementById('Tindak_Lanjut').value
-            };
-            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'saveNotulensi', payload }) })
-                .then(res => res.json())
-                .then(response => {
-                    if (response.result === 'error') throw new Error(response.message);
-                    alert(response.message);
-                }).catch(handleError)
-                .finally(() => {
-                    btn.disabled = false;
-                    btn.textContent = 'Simpan Notulensi';
-                });
-        }
-        
         function handleTableClick(e) {
-            // (Fungsi ini tidak berubah)
             if (e.target.classList.contains('clickable-title')) {
                 e.preventDefault();
                 renderDetailView(e.target.dataset.id);
             }
         }
+
+        // Fungsi baru untuk Ekspor JPG
+        function exportToImage() {
+            const targetElement = document.getElementById('data-table-container');
+            const exportButton = document.getElementById('export-btn');
+            
+            exportButton.textContent = 'Mengekspor...';
+            exportButton.disabled = true;
+
+            html2canvas(targetElement, {
+                scale: 2, // Resolusi 2x lipat
+                useCORS: true 
+            }).then(canvas => {
+                const jpgDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                
+                const link = document.createElement('a');
+                link.download = 'jadwal-rapat.jpg'; // Nama file
+                link.href = jpgDataUrl;
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                exportButton.textContent = 'Ekspor ke JPG';
+                exportButton.disabled = false;
+                
+            }).catch(err => {
+                handleError(new Error('Gagal mengekspor gambar: ' + err.message));
+                exportButton.textContent = 'Ekspor ke JPG';
+                exportButton.disabled = false;
+            });
+        }
         
         function handleError(error) {
-            // (Fungsi ini tidak berubah)
             console.error('Terjadi kesalahan:', error);
             alert(`Terjadi kesalahan: ${error.message}\n\nPastikan URL SCRIPT_URL sudah benar dan script sudah di-deploy.`);
             const submitBtn = document.getElementById('submitBtn');
@@ -378,5 +354,4 @@
         }
     </script>
 </body>
-
 </html>
