@@ -196,7 +196,7 @@
             ALL_DATA.jadwal.sort((a,b) => new Date(b.Timestamp) - new Date(a.Timestamp)).forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${row.Tanggal || ''}<br><small>${row.Waktu || ''}</small></td>
+                    <td>${formatTanggal(row.Tanggal)}<br><small>${row.Waktu || ''}</small></td>
                     <td><a href="#" class="clickable-title" data-id="${row.ID}">${row.Judul}</a></td>
                     <td>${row.Penyelenggara || ''}</td>
                     <td>${row.Ruangan || ''}</td>
@@ -276,7 +276,7 @@
                         <h1>${jadwal.Judul}</h1>
                         
                         <h3 style="color: var(--accent-color);">Detail Rapat</h3>
-                        <p><strong>Tanggal & Waktu:</strong> ${jadwal.Tanggal || '-'} | ${jadwal.Waktu || '-'}</p>
+                        <p><strong>Tanggal & Waktu:</strong> ${formatTanggal(jadwal.Tanggal)} | ${jadwal.Waktu || '-'}</p>
                         <p><strong>Penyelenggara:</strong> ${jadwal.Penyelenggara || '-'}</p>
                         <p><strong>Ruangan:</strong> ${jadwal.Ruangan || '-'}</p>
                         <p><strong>Status:</strong> ${jadwal.Status || '-'}</p>
@@ -407,6 +407,26 @@
             alert(`Terjadi kesalahan: ${error.message}\n\nPastikan URL SCRIPT_URL sudah benar dan script sudah di-deploy.`);
             const submitBtn = document.getElementById('submitBtn');
             if (submitBtn) submitBtn.disabled = false;
+        }
+	// FUNGSI BARU UNTUK MEMPERBAIKI TAMPILAN TANGGAL
+        function formatTanggal(dateString) {
+            if (!dateString) return '-'; // Jika data tanggal kosong
+
+            // Buat objek tanggal dari string mentah
+            const date = new Date(dateString);
+
+            // Ambil tanggal, bulan, dan tahun
+            // (ini otomatis menyesuaikan ke timezone browser kamu, WIB)
+            let day = date.getDate();
+            let month = date.getMonth() + 1; // getMonth() mulai dari 0 (Jan=0)
+            let year = date.getFullYear();
+
+            // Tambahkan '0' di depan jika angkanya satuan
+            if (day < 10) day = '0' + day;
+            if (month < 10) month = '0' + month;
+
+            // Kembalikan format DD-MM-YYYY
+            return `${day}-${month}-${year}`;
         }
     </script>
 </body>
